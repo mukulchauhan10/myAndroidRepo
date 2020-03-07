@@ -2,6 +2,7 @@ package com.example.fragment
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -9,5 +10,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val viewPageAdapter =  ViewPageAdapter(supportFragmentManager)
+        this.viewPager.adapter = viewPageAdapter
+        this.tabLayout1.setupWithViewPager(this.viewPager)
     }
 }
