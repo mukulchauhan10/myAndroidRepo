@@ -18,22 +18,22 @@
             android:id="@+id/tabLayout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabSelectedTextColor="#fff"
-            app:tabRippleColor="#EEB40A"
-            app:tabMode="fixed"
             app:tabGravity="fill"
-            app:tabTextColor="#000000"/>
+            app:tabIndicatorColor="#fff"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="#FFFFFF"
+            app:tabTextColor="#D6D6D6" />
     </com.google.android.material.appbar.AppBarLayout>
 
-<androidx.viewpager.widget.ViewPager
-    android:id="@+id/viewPager"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-    
-</androidx.viewpager.widget.ViewPager>
+
+    </androidx.viewpager.widget.ViewPager>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-<!--coordinator layout is a super power layout of frame layout-->
+    <!--coordinator layout is a super power layout of frame layout-->
