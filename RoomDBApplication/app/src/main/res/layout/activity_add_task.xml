@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".Activity.AddTaskActivity">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/taskNameEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Task Name"
+        android:textColor="#000"
+        android:textAlignment="center"
+        android:layout_marginBottom="10dp"/>
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/taskDescriptionEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Task"
+        android:textColor="#000"
+        android:textAlignment="center"
+        android:layout_marginBottom="10dp"/>
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/taskCommentEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Comment"
+        android:textColor="#000"
+        android:textAlignment="center"
+        android:layout_marginBottom="10dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/submitBtn"
+        android:backgroundTint="#D50000"
+        android:textColor="#fff"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit"
+        />
+
+
+</LinearLayout>
