@@ -43,9 +43,9 @@ class EmailAndPassFragment : Fragment() {
     fun signUp(eMail: String, pass: String) {
         if (eMail.isEmpty() || pass.isEmpty()) {
             if (eMail.isEmpty())
-                showToast("Provide Email ID")
+                showSnackbar("Provide Email ID")
             else
-                showToast("Provide Passcode")
+                showSnackbar("Provide Passcode")
         } else {
             auth.createUserWithEmailAndPassword(eMail, pass)
                 .addOnCompleteListener {
@@ -60,19 +60,22 @@ class EmailAndPassFragment : Fragment() {
                             else
                                 user?.displayName
                             showToast("${name} is registered")
-                            Snackbar.make(requireView(),"${name} is registered",Snackbar.LENGTH_LONG).show()
                         }
                 }.addOnFailureListener {
                     if (it.localizedMessage.contains("network error"))
-                        showToast("Please connect to the Internet")
+                        showSnackbar("Please connect to the Internet")
                     else
-                        showToast(it.localizedMessage)
+                        showSnackbar(it.localizedMessage)
                 }
         }
     }
 
     fun showToast(content: String) {
         Toast.makeText(requireContext(), content, Toast.LENGTH_LONG).show()
+    }
+
+    fun showSnackbar(content: String, duration: Int= 0){
+        Snackbar.make(requireView(),content, duration).show()
     }
 
 }
