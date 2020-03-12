@@ -1,22 +1,17 @@
 package com.example.firebaseauth2.SignUpFragments
 
-
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-
 import com.example.firebaseauth2.R
-import com.google.android.material.snackbar.Snackbar
+import com.example.firebaseauth2.SomeFunction.showSnackbar
+import com.example.firebaseauth2.SomeFunction.showToast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.android.synthetic.main.fragment_email_and_pass.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class EmailAndPassFragment : Fragment() {
 
     override fun onCreateView(
@@ -69,13 +64,4 @@ class EmailAndPassFragment : Fragment() {
                 }
         }
     }
-
-    fun showToast(content: String) {
-        Toast.makeText(requireContext(), content, Toast.LENGTH_LONG).show()
-    }
-
-    fun showSnackbar(content: String, duration: Int= 0){
-        Snackbar.make(requireView(),content, duration).show()
-    }
-
 }

@@ -1,16 +1,14 @@
 package com.example.firebaseauth2.SignUpFragments
 
-
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-
 import com.example.firebaseauth2.R
-import com.google.android.material.snackbar.Snackbar
+import com.example.firebaseauth2.SomeFunction.showSnackbar
+import com.example.firebaseauth2.SomeFunction.showToast
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
@@ -20,9 +18,6 @@ import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.android.synthetic.main.fragment_phone.*
 import java.util.concurrent.TimeUnit
 
-/**
- * A simple [Fragment] subclass.
- */
 class PhoneFragment : Fragment(), View.OnClickListener {
 
     lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
@@ -150,13 +145,5 @@ class PhoneFragment : Fragment(), View.OnClickListener {
                     verifyOtp(storedVerificationId, code)
             }
         }
-    }
-
-    fun showToast(content: String) {
-        Toast.makeText(requireContext(), content, Toast.LENGTH_LONG).show()
-    }
-
-    fun showSnackbar(content: String, duration: Int= 0){
-        Snackbar.make(requireView(),content, duration).show()
     }
 }
