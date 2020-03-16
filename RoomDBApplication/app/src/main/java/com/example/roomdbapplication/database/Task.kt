@@ -8,10 +8,10 @@ import java.util.*
 data class Task(
     val tName: String,
     val tDescription: String,
-    val tCreationDate: Date,
-    val tAchieveDate: Date,
+    val tCreationDate: String,
+    //val tAchieveDate: Date,
     val tComment: String,
-    val tStatus: Boolean,
+    //val tStatus: Boolean,
     val tActivate: Boolean,
     @PrimaryKey(autoGenerate = true)
     val tID: Int =1
