@@ -2,8 +2,10 @@ package com.example.roomdbapplication.Activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
+import com.example.roomdbapplication.CoroutineJob
 import com.example.roomdbapplication.R
 import com.example.roomdbapplication.database.Task
 import com.example.roomdbapplication.database.TaskDatabase
@@ -14,7 +16,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AddTaskActivity : AppCompatActivity() {
+class AddTaskActivity : CoroutineJob() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,8 +28,7 @@ class AddTaskActivity : AppCompatActivity() {
                 val taskDesc = taskDescriptionEditText.text.toString().trim()
                 val taskCmt = taskCommentEditText.text.toString().trim()
                 val taskDate = dateProvider()
-
-                GlobalScope.launch(Dispatchers.Main) {
+                launch {
                     val task = Task(taskName, taskDesc, taskDate, taskCmt, true)
                     TaskDatabase(this@AddTaskActivity).getDao().insertTask(task)
                     Toast.makeText(

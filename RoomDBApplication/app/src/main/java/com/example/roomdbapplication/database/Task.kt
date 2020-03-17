@@ -14,5 +14,5 @@ data class Task(
     //val tStatus: Boolean,
     val tActivate: Boolean,
     @PrimaryKey(autoGenerate = true)
-    val tID: Int =1
+    val tID: Int = 0
 )
