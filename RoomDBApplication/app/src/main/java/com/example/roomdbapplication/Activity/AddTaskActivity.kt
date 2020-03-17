@@ -1,15 +1,16 @@
 package com.example.roomdbapplication.Activity
 
-import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import com.example.roomdbapplication.R
-import com.example.roomdbapplication.database.DataBaseClient
 import com.example.roomdbapplication.database.Task
+import com.example.roomdbapplication.database.TaskDatabase
 import kotlinx.android.synthetic.main.activity_add_task.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -21,13 +22,20 @@ class AddTaskActivity : AppCompatActivity() {
 
         submitBtn.setOnClickListener {
             if (validation()) {
-
                 val taskName = taskNameEditText.text.toString().trim()
                 val taskDesc = taskDescriptionEditText.text.toString().trim()
                 val taskCmt = taskCommentEditText.text.toString().trim()
                 val taskDate = dateProvider()
-                val task = Task(taskName, taskDesc, taskDate, taskCmt, true)
-                saveTask(task)
+
+                GlobalScope.launch(Dispatchers.Main) {
+                    val task = Task(taskName, taskDesc, taskDate, taskCmt, true)
+                    TaskDatabase(this@AddTaskActivity).getDao().insertTask(task)
+                    Toast.makeText(
+                        this@AddTaskActivity,
+                        "${task.tName} is saved",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         }
     }
@@ -56,27 +64,9 @@ class AddTaskActivity : AppCompatActivity() {
         val date = dateFormat.format(now.time).toString()
         return date
     }
+    /*
+    * AsycTask was a lenthy process, as well as old technology
+    * so, that we always use Coroutines instead.
+    */
 
-    private fun saveTask(task: Task) {
-        /*
-        * Main thread doesn't allow DB operation, because DB operation takes long time,
-          and due to such problems our main thread can be block.
-
-        * So, to overcome this problem we use AsyncTask means Asynchronized Tasking
-        */
-
-
-        class SaveTask : AsyncTask<Void, Void, Void>() {
-            override fun doInBackground(vararg params: Void?): Void? {
-                DataBaseClient.getInstance(applicationContext)?.taskDatabase?.setDao()?.insertTask(task)
-                return null
-            }
-
-            override fun onPostExecute(result: Void?) {
-                super.onPostExecute(result)
-                Toast.makeText(this@AddTaskActivity, "${task.tName} is saved", Toast.LENGTH_LONG).show()
-            }
-        }
-        SaveTask().execute()
-    }
 }
