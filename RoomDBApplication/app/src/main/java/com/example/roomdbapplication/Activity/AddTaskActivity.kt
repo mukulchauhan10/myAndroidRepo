@@ -1,8 +1,6 @@
 package com.example.roomdbapplication.Activity
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
 import com.example.roomdbapplication.CoroutineJob
@@ -10,8 +8,6 @@ import com.example.roomdbapplication.R
 import com.example.roomdbapplication.database.Task
 import com.example.roomdbapplication.database.TaskDatabase
 import kotlinx.android.synthetic.main.activity_add_task.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,15 +17,17 @@ class AddTaskActivity : CoroutineJob() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
-
+        setSupportActionBar(toolbar2)
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+        }
         submitBtn.setOnClickListener {
             if (validation()) {
                 val taskName = taskNameEditText.text.toString().trim()
                 val taskDesc = taskDescriptionEditText.text.toString().trim()
-                val taskCmt = taskCommentEditText.text.toString().trim()
                 val taskDate = dateProvider()
                 launch {
-                    val task = Task(taskName, taskDesc, taskDate, taskCmt, true)
+                    val task = Task(taskName, taskDesc, taskDate, true)
                     TaskDatabase(this@AddTaskActivity).getDao().insertTask(task)
                     Toast.makeText(
                         this@AddTaskActivity,
@@ -37,6 +35,7 @@ class AddTaskActivity : CoroutineJob() {
                         Toast.LENGTH_LONG
                     ).show()
                 }
+                finish()
             }
         }
     }
@@ -44,9 +43,7 @@ class AddTaskActivity : CoroutineJob() {
     private fun validation(): Boolean {
         val validation = if (taskNameEditText.emptyVerfication())
             false
-        else if (taskDescriptionEditText.emptyVerfication())
-            false
-        else !taskCommentEditText.emptyVerfication()
+        else !taskDescriptionEditText.emptyVerfication()
         return validation
     }
 

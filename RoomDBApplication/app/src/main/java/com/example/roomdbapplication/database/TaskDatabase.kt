@@ -25,7 +25,7 @@ abstract class TaskDatabase : RoomDatabase() {
                 context.applicationContext,
                 TaskDatabase::class.java,
                 "noteDatabase1"
-            ).build()
+            ).fallbackToDestructiveMigration().build()
 
 
     }

@@ -9,9 +9,6 @@ data class Task(
     val tName: String,
     val tDescription: String,
     val tCreationDate: String,
-    //val tAchieveDate: Date,
-    val tComment: String,
-    //val tStatus: Boolean,
     val tActivate: Boolean,
     @PrimaryKey(autoGenerate = true)
     val tID: Int = 0

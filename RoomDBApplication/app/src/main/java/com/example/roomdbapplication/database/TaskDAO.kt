@@ -1,10 +1,7 @@
 package com.example.roomdbapplication.database
 
 import android.util.Log
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
 interface TaskDAO {
@@ -14,6 +11,8 @@ interface TaskDAO {
     @Query("select * from Task order by tID desc")
     suspend fun getAllTask(): List<Task>
 
+    @Update
+    fun updateTask(task: Task)
     /*@Delete()
     fun deleteTask(tID: Int)*/
 }
