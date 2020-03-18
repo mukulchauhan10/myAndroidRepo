@@ -12,6 +12,7 @@ import com.example.roomdbapplication.R
 import com.example.roomdbapplication.database.Task
 import kotlinx.android.synthetic.main.list_item.view.*
 import kotlinx.android.synthetic.main.list_item.view.taskNameView
+import java.util.concurrent.RecursiveAction
 
 class TaskAdapter(val taskList: List<Task>) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>(){
 
@@ -33,10 +34,8 @@ class TaskAdapter(val taskList: List<Task>) : RecyclerView.Adapter<TaskAdapter.T
         holder.view.taskNameView.text = taskList[position].tName
         holder.view.taskDescView.text = taskList[position].tDescription
         holder.view.taskDateView.text = taskList[position].tCreationDate
-
     }
 
     inner class TaskViewHolder(val view: View) : RecyclerView.ViewHolder(view)
-
 
 }

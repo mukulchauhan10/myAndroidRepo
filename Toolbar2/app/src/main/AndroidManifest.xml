@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".BlankActivity"></activity>
+        <activity android:name=".BlankFragment"></activity>
         <activity android:name=".NavigationActivity" />
         <activity
             android:name=".ToolbarActivity"

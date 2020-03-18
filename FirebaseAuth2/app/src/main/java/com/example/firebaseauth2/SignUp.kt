@@ -6,6 +6,7 @@ import android.view.View
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.example.firebaseauth2.SignUpFragments.EmailAndPassFragment
+import com.example.firebaseauth2.SignUpFragments.FacebookFragment
 import com.example.firebaseauth2.SignUpFragments.GoogleFragment
 import com.example.firebaseauth2.SignUpFragments.PhoneFragment
 import kotlinx.android.synthetic.main.activity_sign_up.*
@@ -70,6 +71,10 @@ class SignUp : AppCompatActivity(), View.OnClickListener {
                     .commit()
             }
             R.id.faceboolSignUpBtn -> {
+                fragmentManager.beginTransaction()
+                    .replace(R.id.frameLayout, FacebookFragment(), "fragment4")
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .commit()
             }
         }
     }

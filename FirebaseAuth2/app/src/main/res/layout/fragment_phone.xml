@@ -65,6 +65,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Otp"
+                android:maxLength="6"
                 android:imeOptions="actionDone"
                 android:inputType="numberPassword" />
 
@@ -75,9 +76,9 @@
             android:layout_width="100dp"
             android:layout_height="60dp"
             android:text="Verify"
+            android:enabled="false"
             android:textAllCaps="false"
             android:textSize="18sp"
             app:cornerRadius="30dp" />
-
     </TableRow>
 </TableLayout>

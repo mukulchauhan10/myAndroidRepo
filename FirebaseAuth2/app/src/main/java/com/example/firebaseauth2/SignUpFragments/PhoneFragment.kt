@@ -1,6 +1,8 @@
 package com.example.firebaseauth2.SignUpFragments
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -18,7 +20,7 @@ import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.android.synthetic.main.fragment_phone.*
 import java.util.concurrent.TimeUnit
 
-class PhoneFragment : Fragment(), View.OnClickListener {
+class PhoneFragment : Fragment(), View.OnClickListener{
 
     lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
     lateinit var storedVerificationId: String

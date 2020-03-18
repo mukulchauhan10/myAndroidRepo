@@ -1,6 +1,7 @@
 package com.example.roomdbapplication.database
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.room.*
 
 @Dao
@@ -9,10 +10,13 @@ interface TaskDAO {
     suspend fun insertTask(task: Task)
 
     @Query("select * from Task order by tID desc")
-    suspend fun getAllTask(): List<Task>
+    fun getAllTask(): LiveData<List<Task>>
 
-    @Update
-    fun updateTask(task: Task)
+    @Query("delete from Task where tid = :uid")
+    fun deleteTask(uid: Int)
+
+    @Query("update Task set tActivate = 0 where tID = :uid")
+    fun updateTask(uid: Int)
     /*@Delete()
     fun deleteTask(tID: Int)*/
 }

@@ -3,4 +3,8 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
+    <color name="dullStroke">#A5A5A5</color>
+    <color name="darkStroke">#000000</color>
+    <color name="facebookStroke">#447EC9</color>
 </resources>

@@ -2,6 +2,7 @@ package com.example.firebaseauth2.SignUpFragments
 
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -22,7 +23,7 @@ import kotlinx.android.synthetic.main.fragment_google.*
 /**
  * A simple [Fragment] subclass.
  */
-class GoogleFragment : Fragment() {
+class GoogleFragment : Fragment(), View.OnClickListener {
 
     private lateinit var googleSignInClient: GoogleSignInClient // to use GoogleSignInClient class import a dependency manaully of google play
     override fun onCreateView(
@@ -47,9 +48,9 @@ class GoogleFragment : Fragment() {
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), googleSignInOptions)
-        googleRegisterBtn.setOnClickListener {
-            signIn()
-        }
+        googleRegisterBtn.setOnClickListener (this)
+        googleLogOutBtn.setOnClickListener(this)
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -61,19 +62,26 @@ class GoogleFragment : Fragment() {
                 if (account != null)
                     firebaseAuthWithGoogle(account)
             } catch (e: ApiException) {
-                showSnackbar("Google sign in failed")
+
             }
         }
     }
 
     private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
-
-
+        progressBar.visibility = View.VISIBLE
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
         auth.signInWithCredential(credential)
             .addOnCompleteListener {
+
                 if (it.isSuccessful) {
-                    progressBar.visibility = View.VISIBLE
+
+                    googleRegisterBtn.isEnabled =false
+                    googleRegisterBtn.setStrokeColorResource(R.color.dullStroke)
+                    googleRegisterBtn.setTextColor(Color.GRAY)
+
+                    googleLogOutBtn.isEnabled= true
+                    googleLogOutBtn.setStrokeColorResource(R.color.darkStroke)
+                    googleLogOutBtn.setTextColor(Color.BLACK)
                     val user = auth.currentUser
                     showToast("${user?.displayName} is logged in")
                 } else {
@@ -82,7 +90,7 @@ class GoogleFragment : Fragment() {
                     else
                         showSnackbar("Authentication failed")
                 }
-                progressBar.visibility = View.GONE
+                progressBar.visibility = View.INVISIBLE
             }
     }
 
@@ -93,5 +101,36 @@ class GoogleFragment : Fragment() {
 
     companion object {
         private const val RC_SIGN_IN = 9001
+    }
+
+    override fun onClick(v: View?) {
+        when(v?.id){
+            R.id.googleRegisterBtn -> signIn()
+            R.id.googleLogOutBtn -> signOut()
+        }
+    }
+
+    private fun signOut() {
+        auth.signOut()
+        googleSignInClient.signOut().addOnCompleteListener(requireActivity()) {
+            progressBar.visibility = View.VISIBLE
+            if(it.isSuccessful) {
+                showToast("User is Logged out successfully")
+                googleRegisterBtn.isEnabled = true
+                googleRegisterBtn.setStrokeColorResource(R.color.darkStroke)
+                googleRegisterBtn.setTextColor(Color.BLACK)
+
+                googleLogOutBtn.isEnabled = false
+                googleLogOutBtn.setStrokeColorResource(R.color.dullStroke)
+                googleLogOutBtn.setTextColor(Color.GRAY)
+            }
+            else{
+                if(it.exception?.localizedMessage!!.contains("network error", true))
+                    showSnackbar("Please connect to the Internet")
+                else
+                    showSnackbar("Some error occured")
+            }
+            progressBar.visibility = View.INVISIBLE
+        }
     }
 }
