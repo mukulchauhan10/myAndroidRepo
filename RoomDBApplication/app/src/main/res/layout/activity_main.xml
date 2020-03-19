@@ -7,12 +7,15 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <com.google.android.material.appbar.MaterialToolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="#0DCDA7"
-        app:title="Task" />
+        android:layout_height="50dp"
+        android:background="@drawable/tootbar_fancy"
+        android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar"
+        android:layout_margin="7dp"
+        app:title="Task"
+        tools:targetApi="p" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -22,7 +25,7 @@
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="10dp" />
+            android:padding="10dp"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floatingActionButton"
@@ -30,11 +33,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
+            android:backgroundTint="#fff"
             android:layout_marginEnd="23dp"
             android:layout_marginBottom="21dp"
             android:clickable="true"
             app:srcCompat="@drawable/add_icon" />
     </RelativeLayout>
-
 
 </LinearLayout>
