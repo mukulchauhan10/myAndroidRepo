@@ -1,32 +1,26 @@
 package com.example.roomdbapplication
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.Toast
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.roomdbapplication.Activity.AddTaskActivity
 import com.example.roomdbapplication.Activity.BinActivity
-import com.example.roomdbapplication.Activity.RecyclerViewOnClick
 import com.example.roomdbapplication.Activity.TaskAdapter
 import com.example.roomdbapplication.database.Task
 import com.example.roomdbapplication.database.TaskDatabase
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.list_item.*
-import kotlinx.android.synthetic.main.list_item.view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
-const val b: Int = 5
 class MainActivity : AppCompatActivity() {
-    lateinit var taskList: List<Task>
 
-    private lateinit var taskAdapter: TaskAdapter
+    var taskList = arrayListOf<Task>()
+    val taskAdapter = TaskAdapter(taskList)
+    val db by lazy {
+        TaskDatabase.buildDatabase(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,16 +29,19 @@ class MainActivity : AppCompatActivity() {
         recyclerView.apply {
             setHasFixedSize(true)
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-
+            adapter = this@MainActivity.taskAdapter // use this: taskAdapter
         }
 
-        /*GlobalScope.launch(Dispatchers.Main) {
-            taskList = TaskDatabase(this@MainActivity).getDao().getAllTask()
-            taskAdapter = TaskAdapter(taskList)
-            recyclerView.adapter = taskAdapter
-            taskAdapter.notifyDataSetChanged()
-        }*/
-
+        db.getDao().getAllTask().observe(this, Observer {
+            if (!it.isNullOrEmpty()) {
+                taskList.clear()
+                taskList.addAll(it)
+                taskAdapter.notifyDataSetChanged()
+            } else {
+                taskList.clear()
+                taskAdapter.notifyDataSetChanged()
+            }
+        })
 
         floatingActionButton.setOnClickListener {
             startActivity(Intent(this, AddTaskActivity::class.java))
@@ -62,7 +59,8 @@ class MainActivity : AppCompatActivity() {
             R.id.bin -> {
                 startActivity(Intent(this, BinActivity::class.java))
             }
-            R.id.search ->{}
+            R.id.search -> {
+            }
         }
         return super.onOptionsItemSelected(item)
     }

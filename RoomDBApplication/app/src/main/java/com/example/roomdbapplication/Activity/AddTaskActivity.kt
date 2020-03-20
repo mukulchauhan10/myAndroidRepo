@@ -1,27 +1,29 @@
 package com.example.roomdbapplication.Activity
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
+import android.app.*
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.EditText
-import android.widget.Toast
+import android.view.*
+import android.widget.*
 import com.example.roomdbapplication.CoroutineJob
 import com.example.roomdbapplication.R
 import com.example.roomdbapplication.database.Task
 import com.example.roomdbapplication.database.TaskDatabase
 import kotlinx.android.synthetic.main.activity_add_task.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
+
+const val DB_NAME = "noteDatabase1"
 
 class AddTaskActivity : CoroutineJob() {
 
     val myCalendar by lazy {
         Calendar.getInstance()
     }
+    var exactDate: String? = null
+    var exactTime: String? = null
     lateinit var settableDateTime: String
     lateinit var dateTimeFormat: SimpleDateFormat
 
@@ -46,16 +48,28 @@ class AddTaskActivity : CoroutineJob() {
                 if (validation()) {
                     val taskName = taskNameEditText.text.toString().trim()
                     val taskDesc = taskDescriptionEditText.text.toString().trim()
+                    val activationInfo = isRemainderActivate(exactDate, exactTime)
                     val taskDate = dateProvider()
-
+                    lateinit var task: Task
                     launch {
-                        val task = Task(taskName, taskDesc, taskDate, true)
-                        TaskDatabase(this@AddTaskActivity).getDao().insertTask(task)
+                        val id = withContext(Dispatchers.IO) {
+                            task = Task(
+                                taskName,
+                                taskDesc,
+                                taskDate,
+                                exactDate,
+                                exactTime,
+                                activationInfo
+                            )
+                            return@withContext TaskDatabase(this@AddTaskActivity).getDao()
+                                .insertTask(task)
+                        }
                         Toast.makeText(
                             this@AddTaskActivity,
                             "${task.tName} is saved",
                             Toast.LENGTH_LONG
                         ).show()
+
                     }
                     finish()
                 }
@@ -101,8 +115,9 @@ class AddTaskActivity : CoroutineJob() {
                 myCalendar.set(Calendar.MONTH, month)
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                 dateTimeFormat = SimpleDateFormat("EEE, dd MMM, yyyy", Locale.US)
-                settableDateTime = dateTimeFormat.format(myCalendar.time).toString()
-                dateTimeTextView.text = "We will inform you on $settableDateTime"
+                settableDateTime = dateTimeFormat.format(myCalendar.time)
+                exactDate = settableDateTime
+                dateTimeTextView.text = "We will inform you on ${settableDateTime.toString()}"
                 lineImage.visibility = View.VISIBLE
                 timeDialog()
             }
@@ -114,7 +129,8 @@ class AddTaskActivity : CoroutineJob() {
             myCalendar.get(Calendar.MONTH),
             myCalendar.get(Calendar.DAY_OF_MONTH)
         )
-        datePickerDialog.datePicker.minDate = System.currentTimeMillis()  // previous date will not visible from current date
+        datePickerDialog.datePicker.minDate =
+            System.currentTimeMillis()  // previous date will not visible from current date
         datePickerDialog.show()
     }
 
@@ -124,8 +140,9 @@ class AddTaskActivity : CoroutineJob() {
                 myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 myCalendar.set(Calendar.MINUTE, minute)
                 dateTimeFormat = SimpleDateFormat("hh:mm a", Locale.US)
-                settableDateTime = dateTimeFormat.format(myCalendar.time).toString()
-                dateTimeTextView.append(" at $settableDateTime")
+                settableDateTime = dateTimeFormat.format(myCalendar.time)
+                exactTime = settableDateTime
+                dateTimeTextView.append(" at ${settableDateTime}")
             }
         val timePickerDialog = TimePickerDialog(
             this,
@@ -136,4 +153,6 @@ class AddTaskActivity : CoroutineJob() {
         timePickerDialog.show()
     }
 
+    private fun isRemainderActivate(date: String?, time: String?): Boolean =
+        date != null || time != null
 }
