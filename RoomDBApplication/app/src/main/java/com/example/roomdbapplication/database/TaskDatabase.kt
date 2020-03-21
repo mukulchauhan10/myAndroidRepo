@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.*
 import com.example.roomdbapplication.Activity.DB_NAME
 
-@Database(entities = [Task::class], version = 1)
+@Database(entities = [Task::class], version = 3)
 abstract class TaskDatabase : RoomDatabase() {
 
     abstract fun getDao(): TaskDAO
@@ -12,9 +12,7 @@ abstract class TaskDatabase : RoomDatabase() {
     companion object {
         @Volatile
         private var mInstance: TaskDatabase? = null
-        private val LOCK = Any()
-
-        operator fun invoke(context: Context) = mInstance ?: synchronized(LOCK) {
+        /*operator fun invoke(context: Context) = mInstance ?: synchronized(this) {
             mInstance ?: buildDatabase(context)
         }
 
@@ -22,6 +20,23 @@ abstract class TaskDatabase : RoomDatabase() {
             context.applicationContext,
             TaskDatabase::class.java,
             DB_NAME
-        ).fallbackToDestructiveMigration().build()
+        ).fallbackToDestructiveMigration().build()*/
+
+
+        fun buildDatabase(context: Context): TaskDatabase {
+            val tempInstance = mInstance
+            if (tempInstance != null) {
+                return tempInstance
+            }
+            synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    TaskDatabase::class.java,
+                    DB_NAME
+                ).fallbackToDestructiveMigration().build()
+                mInstance = instance
+                return instance
+            }
+        }
     }
 }

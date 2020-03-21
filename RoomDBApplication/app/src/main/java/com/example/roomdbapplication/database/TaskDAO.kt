@@ -11,11 +11,22 @@ interface TaskDAO {
     @Query("select * from Task order by tid desc")
     fun getAllTask(): LiveData<List<Task>>
 
+    @Query("select * from Task where tID = :taskID")
+    suspend fun getTheTask(taskID: Int)
+
     @Query("delete from Task where tid = :uid")
     fun deleteTask(uid: Int)
 
-    @Query("update Task set tActivate = 0 where tID = :uid")
-    fun updateTask(uid: Int)
+    @Query("update Task set tName = :uTitle, tTask = :uTask, tEditDate = :uEditDate, tRemainderDate = :uRemDate, tRemainderTime = :uRemTime, tActivate = :uActivation where tID = :uId")
+    fun updateTask(
+        uTitle: String?,
+        uTask: String?,
+        uEditDate: String,
+        uRemDate: String?,
+        uRemTime: String?,
+        uActivation: Boolean,
+        uId: Int
+    )
     /*@Delete()
     fun deleteTask(tID: Int)*/
 }

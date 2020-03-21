@@ -4,9 +4,9 @@ import androidx.room.*
 
 @Entity
 data class Task(
-    val tName: String,
-    val tDescription: String,
-    val tCreationDate: String,
+    val tName: String?,
+    val tTask: String?,
+    val tEditDate: String,
     val tRemainderDate: String? = null,
     val tRemainderTime: String? = null,
     val tActivate: Boolean,

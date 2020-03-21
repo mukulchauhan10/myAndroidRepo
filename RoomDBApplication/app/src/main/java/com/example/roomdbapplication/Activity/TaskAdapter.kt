@@ -6,7 +6,8 @@ import com.example.roomdbapplication.R
 import com.example.roomdbapplication.database.Task
 import kotlinx.android.synthetic.main.list_item.view.*
 
-class TaskAdapter(val taskList: List<Task>) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
+class TaskAdapter(val taskList: List<Task>, val recyclerItemViewClick: RecyclerItemViewClick) :
+    RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         return TaskViewHolder(
@@ -22,15 +23,35 @@ class TaskAdapter(val taskList: List<Task>) : RecyclerView.Adapter<TaskAdapter.T
     override fun getItemCount(): Int = taskList.size
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-        holder.view.taskNameView.text = taskList[position].tName
-        holder.view.taskDescView.text = taskList[position].tDescription
-        if(taskList[position].tRemainderDate != null || taskList[position].tRemainderTime != null ){
-            holder.view.taskRemainderTextView.apply {
-                visibility = View.VISIBLE
-                text = " ${taskList[position].tRemainderDate.toString()} | ${taskList[position].tRemainderTime.toString()}"
+        with(holder.view) {
+            if (taskList[position].tName != null)
+                taskNameView.apply {
+                    text = taskList[position].tName
+                    visibility = View.VISIBLE
+                }
+            if (taskList[position].tDescription != null)
+                taskDescView.apply {
+                    text = taskList[position].tDescription
+                    visibility = View.VISIBLE
+                }
+            if (taskList[position].tRemainderDate != null || taskList[position].tRemainderTime != null) {
+                taskRemainderTextView.apply {
+                    visibility = View.VISIBLE
+                    text =
+                        " ${taskList[position].tRemainderDate.toString()} | ${taskList[position].tRemainderTime.toString()}"
+                }
             }
+            setOnClickListener(object : View.OnClickListener {
+                override fun onClick(v: View?) {
+                    recyclerItemViewClick.onItemClick(position)
+                }
+            })
         }
     }
 
     inner class TaskViewHolder(val view: View) : RecyclerView.ViewHolder(view)
+
+    interface RecyclerItemViewClick {
+        fun onItemClick(position: Int)
+    }
 }

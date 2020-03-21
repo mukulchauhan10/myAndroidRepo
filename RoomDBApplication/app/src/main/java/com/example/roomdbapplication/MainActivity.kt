@@ -2,6 +2,7 @@ package com.example.roomdbapplication
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -11,12 +12,13 @@ import com.example.roomdbapplication.Activity.BinActivity
 import com.example.roomdbapplication.Activity.TaskAdapter
 import com.example.roomdbapplication.database.Task
 import com.example.roomdbapplication.database.TaskDatabase
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), TaskAdapter.RecyclerItemViewClick {
 
     var taskList = arrayListOf<Task>()
-    val taskAdapter = TaskAdapter(taskList)
+    val taskAdapter = TaskAdapter(taskList, this)
     val db by lazy {
         TaskDatabase.buildDatabase(this)
     }
@@ -25,6 +27,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        val value = intent.getIntExtra("key", 0)
+        if (value == 1) {
+            Log.i("position", "done")
+            Snackbar.make(parentLayout, "Blank note discarded", Snackbar.LENGTH_LONG).show()
+        }
 
         recyclerView.apply {
             setHasFixedSize(true)
@@ -37,16 +45,14 @@ class MainActivity : AppCompatActivity() {
                 taskList.clear()
                 taskList.addAll(it)
                 taskAdapter.notifyDataSetChanged()
-            } else {
-                taskList.clear()
-                taskAdapter.notifyDataSetChanged()
             }
         })
 
         floatingActionButton.setOnClickListener {
             startActivity(Intent(this, AddTaskActivity::class.java))
-        }
+            //val value = intent.getIntExtra("key", 0)
 
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -63,6 +69,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onItemClick(position: Int) {
+        val intent = Intent(this, AddTaskActivity::class.java)
+        intent.putExtra("taskId", taskList[position].tID)
+        intent.putExtra("taskTitle", taskList[position].tName)
+        intent.putExtra("taskDesc", taskList[position].tDescription)
+        intent.putExtra("taskCreationDate", taskList[position].tCreationDate)
+        intent.putExtra("taskRemainderDate", taskList[position].tRemainderDate)
+        intent.putExtra("taskRemainderTime", taskList[position].tRemainderTime)
+        intent.putExtra("taskActivation", taskList[position].tActivate)
+        startActivity(intent)
     }
 }
 
