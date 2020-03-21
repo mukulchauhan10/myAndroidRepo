@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.*
 import com.example.roomdbapplication.Activity.DB_NAME
 
-@Database(entities = [Task::class], version = 3)
+@Database(entities = [Task::class], version = 1)
 abstract class TaskDatabase : RoomDatabase() {
 
     abstract fun getDao(): TaskDAO

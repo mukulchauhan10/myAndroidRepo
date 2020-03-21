@@ -29,9 +29,9 @@ class TaskAdapter(val taskList: List<Task>, val recyclerItemViewClick: RecyclerI
                     text = taskList[position].tName
                     visibility = View.VISIBLE
                 }
-            if (taskList[position].tDescription != null)
+            if (taskList[position].tTask != null)
                 taskDescView.apply {
-                    text = taskList[position].tDescription
+                    text = taskList[position].tTask
                     visibility = View.VISIBLE
                 }
             if (taskList[position].tRemainderDate != null || taskList[position].tRemainderTime != null) {

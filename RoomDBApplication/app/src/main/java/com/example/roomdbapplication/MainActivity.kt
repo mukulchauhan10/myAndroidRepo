@@ -28,8 +28,8 @@ class MainActivity : AppCompatActivity(), TaskAdapter.RecyclerItemViewClick {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        val value = intent.getIntExtra("key", 0)
-        if (value == 1) {
+        val isNoteEmpty = intent.getBooleanExtra("isNoteEmpty", false)
+        if (isNoteEmpty) {
             Log.i("position", "done")
             Snackbar.make(parentLayout, "Blank note discarded", Snackbar.LENGTH_LONG).show()
         }
@@ -73,13 +73,15 @@ class MainActivity : AppCompatActivity(), TaskAdapter.RecyclerItemViewClick {
 
     override fun onItemClick(position: Int) {
         val intent = Intent(this, AddTaskActivity::class.java)
+
+        intent.putExtra("isTaskOld", true)
         intent.putExtra("taskId", taskList[position].tID)
         intent.putExtra("taskTitle", taskList[position].tName)
-        intent.putExtra("taskDesc", taskList[position].tDescription)
-        intent.putExtra("taskCreationDate", taskList[position].tCreationDate)
+        intent.putExtra("taskDesc", taskList[position].tTask)
+        intent.putExtra("taskCreationDate", taskList[position].tEditDate)
         intent.putExtra("taskRemainderDate", taskList[position].tRemainderDate)
         intent.putExtra("taskRemainderTime", taskList[position].tRemainderTime)
-        intent.putExtra("taskActivation", taskList[position].tActivate)
+        //intent.putExtra("taskActivation", taskList[position].tActivate)
         startActivity(intent)
     }
 }

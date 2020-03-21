@@ -1,8 +1,7 @@
 package com.example.roomdbapplication.Activity
 
 import android.app.*
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -12,13 +11,8 @@ import com.example.roomdbapplication.MainActivity
 import com.example.roomdbapplication.R
 import com.example.roomdbapplication.database.Task
 import com.example.roomdbapplication.database.TaskDatabase
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_add_task.*
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.list_item.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,42 +22,44 @@ class AddTaskActivity : CoroutineJob() {
 
     val db by lazy { TaskDatabase.buildDatabase(this) }
     val myCalendar by lazy { Calendar.getInstance() }
+
     var exactDate: String? = null
     var exactTime: String? = null
+
     lateinit var settableDateTime: String
     lateinit var dateTimeFormat: SimpleDateFormat
 
-    var task1: Task? = null
     var oldTId: Int? = null
-    var oldTitle: String? = null
-    var oldTask: String? = null
-    var oldEditDate: String? = null
-    var oldRemDate: String? = null
-    var oldRemTime: String? = null
-    var oldActivation: Boolean = false
+    var isTaskOld: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
-        editedDateView.append(dateProvider())
+
         setSupportActionBar(toolbar2)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
         }
 
-        oldTId = intent.getIntExtra("taskId", 1)
-        oldTitle = intent.getStringExtra("taskTitle")
-        oldTask = intent.getStringExtra("taskDesc")
-        oldEditDate = intent.getStringExtra("taskCreationDate")
-        oldRemDate = intent.getStringExtra("taskRemainderDate")
-        oldRemTime = intent.getStringExtra("taskRemainderTime")
-        oldActivation = intent.getBooleanExtra("taskActivation", false)
-        taskNameEditText.setText(oldTitle)
-        taskDescriptionEditText.setText(oldTask)
-        editedDateView.append(oldEditDate)
-        dateTimeTextView.text = "We will inform you on $oldRemDate at $oldRemTime"
-        task1 =
-            Task(oldTitle, oldTask, oldEditDate!!, oldRemDate, oldRemTime, oldActivation, oldTId!!)
+        isTaskOld = intent.getBooleanExtra("isTaskOld", false)
+        Log.i("position", "1")
+
+
+        if (isTaskOld) {
+            oldTId = intent.getIntExtra("taskId", 0)
+            val oldTitle: String? = intent.getStringExtra("taskTitle")
+            val oldTask: String? = intent.getStringExtra("taskDesc")
+            val oldEditDate = intent.getStringExtra("taskCreationDate")
+            val oldRemDate: String? = intent.getStringExtra("taskRemainderDate")
+            val oldRemTime: String? = intent.getStringExtra("taskRemainderTime")
+
+            taskNameEditText.setText(oldTitle)
+            taskDescriptionEditText.setText(oldTask)
+            editedDateView.append(oldEditDate); Log.i("position", "10")
+            dateTimeTextView.text =
+                "We will inform you on $oldRemDate at $oldRemTime"
+        }else
+            editedDateView.append(dateProvider())
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -80,7 +76,7 @@ class AddTaskActivity : CoroutineJob() {
                 val taskDate: String = dateProvider()
                 lateinit var task: Task
                 if (!taskName.isNullOrEmpty() || !taskDesc.isNullOrEmpty()) {
-                    oldTId?.let {
+                    if (isTaskOld) {
                         launch {
                             withContext(Dispatchers.IO) {
                                 return@withContext db.getDao().updateTask(
@@ -93,38 +89,29 @@ class AddTaskActivity : CoroutineJob() {
                                     oldTId!!
                                 )
                             }
-                            Toast.makeText(
-                                this@AddTaskActivity,
-                                "$taskName is updated",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            this@AddTaskActivity.showToast("$taskName is updated")
                         }
-                    }?
-                }
-                 if (!taskName.isNullOrEmpty() || !taskDesc.isNullOrEmpty()) {
-
-                    launch {
-                        withContext(Dispatchers.IO) {
-                            task = Task(
-                                taskName,
-                                taskDesc,
-                                taskDate,
-                                exactDate,
-                                exactTime,
-                                activationInfo
-                            )
-                            return@withContext db.getDao().insertTask(task!!)
+                    } else {
+                        launch {
+                            withContext(Dispatchers.IO) {
+                                task = Task(
+                                    taskName,
+                                    taskDesc,
+                                    taskDate,
+                                    exactDate,
+                                    exactTime,
+                                    activationInfo
+                                )
+                                return@withContext db.getDao().insertTask(task)
+                            }
+                            this@AddTaskActivity.showToast("${task.tName} is saved")
                         }
-                        Toast.makeText(
-                            this@AddTaskActivity,
-                            "${task!!.tName} is saved",
-                            Toast.LENGTH_LONG
-                        ).show()
                     }
                     finish()
                 } else if (taskName.isNullOrEmpty() && taskDesc.isNullOrEmpty()) {
-                    Log.i("position", "process")
-                    Intent().putExtra("key", 1)
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.putExtra("isNoteEmpty", true)
+                    startActivity(intent)
                     finish()
                 }
             }
@@ -192,4 +179,7 @@ class AddTaskActivity : CoroutineJob() {
 
     private fun isRemainderActivate(date: String?, time: String?): Boolean =
         date != null || time != null
+
+    private fun Context.showToast(content: String) =
+        Toast.makeText(this, content, Toast.LENGTH_LONG).show()
 }

@@ -36,15 +36,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         mediaButton.setOnClickListener {
-            startActivity(Intent(this,MediaPlayer::class.java))
+            //startActivity(Intent(this,MediaPlayer::class.java))
+            //val file  =
         }
 
         restorebutton.setOnClickListener {
 
         }
     }
-
-
 
     private fun letsCome() {
         Toast.makeText(this
