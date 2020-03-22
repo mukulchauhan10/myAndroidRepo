@@ -1,5 +1,6 @@
 package com.example.roomdbapplication.Activity
 
+import android.annotation.SuppressLint
 import android.app.*
 import android.content.*
 import android.os.Bundle
@@ -32,6 +33,7 @@ class AddTaskActivity : CoroutineJob() {
     var oldTId: Int? = null
     var isTaskOld: Boolean = false
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
@@ -55,10 +57,12 @@ class AddTaskActivity : CoroutineJob() {
 
             taskNameEditText.setText(oldTitle)
             taskDescriptionEditText.setText(oldTask)
-            editedDateView.append(oldEditDate); Log.i("position", "10")
-            dateTimeTextView.text =
-                "We will inform you on $oldRemDate at $oldRemTime"
-        }else
+            editedDateView.append(oldEditDate)
+            oldRemDate?.let {
+                dateTimeTextView.text = "We will inform you on $oldRemDate"
+                oldRemTime?.let { dateTimeTextView.append(" at $oldRemTime") }
+            }
+        } else
             editedDateView.append(dateProvider())
     }
 
@@ -123,6 +127,7 @@ class AddTaskActivity : CoroutineJob() {
     }
 
     private fun dateProvider(): String {
+        val myCalendar = Calendar.getInstance()
         dateTimeFormat = SimpleDateFormat("dd-MMM-YYYY", Locale.US)
         val date = dateTimeFormat.format(myCalendar.time).toString()
         return date
@@ -133,6 +138,7 @@ class AddTaskActivity : CoroutineJob() {
     */
 
     private fun dateDialog() {
+        //val myCalendar = Calendar.getInstance()
         val dateSetListener: DatePickerDialog.OnDateSetListener =
             DatePickerDialog.OnDateSetListener { view, year: Int, month: Int, dayOfMonth: Int ->
                 myCalendar.set(Calendar.YEAR, year)

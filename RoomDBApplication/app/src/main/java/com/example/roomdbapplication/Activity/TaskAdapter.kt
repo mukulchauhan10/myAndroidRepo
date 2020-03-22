@@ -1,5 +1,6 @@
 package com.example.roomdbapplication.Activity
 
+import android.annotation.SuppressLint
 import android.view.*
 import androidx.recyclerview.widget.RecyclerView
 import com.example.roomdbapplication.R
@@ -22,23 +23,28 @@ class TaskAdapter(val taskList: List<Task>, val recyclerItemViewClick: RecyclerI
 
     override fun getItemCount(): Int = taskList.size
 
+    @SuppressLint("SetTextI18n") // yuhi, alt + Enter
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         with(holder.view) {
-            if (taskList[position].tName != null)
+            taskList[position].tName?.let {
                 taskNameView.apply {
                     text = taskList[position].tName
                     visibility = View.VISIBLE
                 }
-            if (taskList[position].tTask != null)
+            }
+            taskList[position].tTask?.let {
                 taskDescView.apply {
                     text = taskList[position].tTask
                     visibility = View.VISIBLE
                 }
-            if (taskList[position].tRemainderDate != null || taskList[position].tRemainderTime != null) {
+            }
+            taskList[position].tRemainderDate?.let {
                 taskRemainderTextView.apply {
                     visibility = View.VISIBLE
-                    text =
-                        " ${taskList[position].tRemainderDate.toString()} | ${taskList[position].tRemainderTime.toString()}"
+                    text = " ${taskList[position].tRemainderDate}"
+                }
+                taskList[position].tRemainderTime?.let {
+                    taskRemainderTextView.append(" | ${taskList[position].tRemainderTime}")
                 }
             }
             setOnClickListener(object : View.OnClickListener {
