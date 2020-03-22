@@ -1,90 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/childLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/childLayout"
     android:orientation="vertical"
     tools:context=".Activity.AddTaskActivity">
-
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar2"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="7dp"
-        android:background="@drawable/tootbar_fancy"
-        android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar"
-        app:title="New Task">
-
-
-    </com.google.android.material.appbar.MaterialToolbar>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
         android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar2"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="top"
+            android:layout_margin="7dp"
+            android:background="@drawable/tootbar_fancy"
+            android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar"
+            app:menu="@menu/new_task_menu"
+            app:title="New Task" />
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/taskNameEditText"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:background="#00000000"
             android:hint="Title"
             android:imeOptions="actionNext"
             android:inputType="textCapSentences"
             android:paddingStart="10dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="10dp"
             android:textColor="#000"
             android:textCursorDrawable="@drawable/text_curson"
             android:textSize="21sp"
             android:textStyle="bold" />
 
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/taskDescriptionEditText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#00FFFFFF"
+            android:gravity="top"
+            android:hint="Note"
+            android:padding="10dp"
+            android:textColor="#000"
+            android:textCursorDrawable="@drawable/text_curson"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomAppbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="bottom|center"
+        android:backgroundTint="#fff"
+        app:fabAlignmentMode="end"
+        app:fabCradleMargin="10dp"
+        app:fabCradleRoundedCornerRadius="20dp"
+        app:fabCradleVerticalOffset="8dp"
+        app:hideOnScroll="true"
+        app:menu="@menu/bottom_toolbar_menu">
+
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/taskDescriptionEditText"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="10dp"
-                android:background="#00FFFFFF"
-                android:gravity="top"
-                android:hint="Note"
-                android:padding="10dp"
-                android:textColor="#000"
-                android:textCursorDrawable="@drawable/text_curson" />
-
-            <TextView
-                android:id="@+id/dateTimeTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center_horizontal"
-                android:layout_marginBottom="30dp"
-                android:textAlignment="center" />
-
-            <ImageView
-                android:id="@+id/lineImage"
-                android:layout_width="110dp"
-                android:layout_height="1dp"
-                android:layout_gravity="bottom|center_horizontal"
-                android:layout_marginBottom="27dp"
-                android:src="@drawable/line"
-                android:visibility="invisible" />
+            android:layout_height="match_parent"
+            android:layout_marginStart="55dp">
 
             <TextView
                 android:id="@+id/editedDateView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center_horizontal"
-                android:layout_marginBottom="10dp"
-                android:text="Edited: "
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="26dp"
                 android:textColor="#9E9E9E"
+                android:textSize="13sp"
+                android:textStyle="italic"/>
+
+            <ImageView
+                android:id="@+id/lineImage"
+                android:layout_width="130dp"
+                android:layout_height="1dp"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="23dp"
+                android:src="@drawable/line"
+                android:visibility="invisible"/>
+
+            <TextView
+                android:id="@+id/dateTimeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="7dp"
                 android:textSize="13sp"
                 android:textStyle="italic" />
         </FrameLayout>
-    </LinearLayout>
+    </com.google.android.material.bottomappbar.BottomAppBar>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/setRemainderFloatingButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#fff"
+        android:src="@drawable/date_icon"
+        app:layout_anchor="@id/bottomAppbar"
+        app:layout_anchorGravity="right"
+        app:maxImageSize="30dp" />
 
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

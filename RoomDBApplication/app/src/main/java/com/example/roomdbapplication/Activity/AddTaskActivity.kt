@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.*
 import android.content.*
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.*
 import com.example.roomdbapplication.CoroutineJob
@@ -38,15 +37,13 @@ class AddTaskActivity : CoroutineJob() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
 
-        setSupportActionBar(toolbar2)
+        setSupportActionBar(toolbar2) // back button is toolbar ke liye hi app
+
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
         }
 
         isTaskOld = intent.getBooleanExtra("isTaskOld", false)
-        Log.i("position", "1")
-
-
         if (isTaskOld) {
             oldTId = intent.getIntExtra("taskId", 0)
             val oldTitle: String? = intent.getStringExtra("taskTitle")
@@ -57,19 +54,26 @@ class AddTaskActivity : CoroutineJob() {
 
             taskNameEditText.setText(oldTitle)
             taskDescriptionEditText.setText(oldTask)
-            editedDateView.append(oldEditDate)
+            editedDateView.text = "Last Edited: $oldEditDate"
             oldRemDate?.let {
-                dateTimeTextView.text = "We will inform you on $oldRemDate"
+                lineImage.visibility = View.VISIBLE
+                dateTimeTextView.text = "Alert: $oldRemDate"
                 oldRemTime?.let { dateTimeTextView.append(" at $oldRemTime") }
             }
         } else
-            editedDateView.append(dateProvider())
+            editedDateView.text = "Last Edited: ${currentDateProvider()}"
+
+        setRemainderFloatingButton.setOnClickListener {
+            dateDialog()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.new_task_menu, menu)
+        menuInflater.inflate(R.menu.bottom_toolbar_menu, menu)  // not confirm
         return super.onCreateOptionsMenu(menu)
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -77,7 +81,7 @@ class AddTaskActivity : CoroutineJob() {
                 val taskName: String? = taskNameEditText.text?.toString()?.trim()
                 val taskDesc: String? = taskDescriptionEditText.text?.toString()?.trim()
                 val activationInfo: Boolean = isRemainderActivate(exactDate, exactTime)
-                val taskDate: String = dateProvider()
+                val taskDate: String = currentDateProvider()
                 lateinit var task: Task
                 if (!taskName.isNullOrEmpty() || !taskDesc.isNullOrEmpty()) {
                     if (isTaskOld) {
@@ -119,14 +123,14 @@ class AddTaskActivity : CoroutineJob() {
                     finish()
                 }
             }
-            R.id.setRemainder -> {
-                dateDialog()
-            }
+            R.id.share -> {
+                this.showToast("shared")
+            } // not confirm
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun dateProvider(): String {
+    private fun currentDateProvider(): String {
         val myCalendar = Calendar.getInstance()
         dateTimeFormat = SimpleDateFormat("dd-MMM-YYYY", Locale.US)
         val date = dateTimeFormat.format(myCalendar.time).toString()
@@ -141,13 +145,15 @@ class AddTaskActivity : CoroutineJob() {
         //val myCalendar = Calendar.getInstance()
         val dateSetListener: DatePickerDialog.OnDateSetListener =
             DatePickerDialog.OnDateSetListener { view, year: Int, month: Int, dayOfMonth: Int ->
-                myCalendar.set(Calendar.YEAR, year)
-                myCalendar.set(Calendar.MONTH, month)
-                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                myCalendar.apply {
+                    set(Calendar.YEAR, year)
+                    set(Calendar.MONTH, month)
+                    set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                }
                 dateTimeFormat = SimpleDateFormat("EEE, dd MMM, yyyy", Locale.US)
                 settableDateTime = dateTimeFormat.format(myCalendar.time)
                 exactDate = settableDateTime
-                dateTimeTextView.text = "We will inform you on $settableDateTime"
+                dateTimeTextView.text = "Alert: $settableDateTime"
                 lineImage.visibility = View.VISIBLE
                 timeDialog()
             }
