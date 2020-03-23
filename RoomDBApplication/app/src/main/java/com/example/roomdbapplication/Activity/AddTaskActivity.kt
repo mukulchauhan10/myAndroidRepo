@@ -5,7 +5,7 @@ import android.app.*
 import android.content.*
 import android.os.Bundle
 import android.view.*
-import android.widget.*
+import com.example.roomdbapplication.Activity.SomeFunction.showToast
 import com.example.roomdbapplication.CoroutineJob
 import com.example.roomdbapplication.MainActivity
 import com.example.roomdbapplication.R
@@ -37,7 +37,7 @@ class AddTaskActivity : CoroutineJob() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
 
-        setSupportActionBar(toolbar2) // back button is toolbar ke liye hi app
+        setSupportActionBar(newNoteToolbar) // back button is toolbar ke liye hi app
 
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
@@ -67,14 +67,11 @@ class AddTaskActivity : CoroutineJob() {
             dateDialog()
         }
     }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.new_task_menu, menu)
-        menuInflater.inflate(R.menu.bottom_toolbar_menu, menu)  // not confirm
+        menuInflater.inflate(R.menu.bottom_toolbar_menu, menu)
         return true
     }
-
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.done -> {
@@ -127,7 +124,7 @@ class AddTaskActivity : CoroutineJob() {
                 this.showToast("shared")
             } // not confirm
         }
-        return true
+        return super.onOptionsItemSelected(item)
     }
 
     private fun currentDateProvider(): String {
@@ -192,6 +189,5 @@ class AddTaskActivity : CoroutineJob() {
     private fun isRemainderActivate(date: String?, time: String?): Boolean =
         date != null || time != null
 
-    private fun Context.showToast(content: String) =
-        Toast.makeText(this, content, Toast.LENGTH_LONG).show()
+
 }

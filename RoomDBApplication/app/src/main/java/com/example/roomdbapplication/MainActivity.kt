@@ -3,23 +3,20 @@ package com.example.roomdbapplication
 import android.content.Intent
 import android.graphics.*
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.roomdbapplication.Activity.AddTaskActivity
-import com.example.roomdbapplication.Activity.BinActivity
-import com.example.roomdbapplication.Activity.RecyclerViewOnClick
-import com.example.roomdbapplication.Activity.TaskAdapter
-import com.example.roomdbapplication.database.Task
-import com.example.roomdbapplication.database.TaskDatabase
+import androidx.recyclerview.widget.*
+import com.example.roomdbapplication.Activity.*
+import com.example.roomdbapplication.database.*
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.*
+import com.example.roomdbapplication.Activity.SomeFunction.showSnackbar
+import com.example.roomdbapplication.Activity.SomeFunction.showToast
 
 class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
+
 
     var taskList = arrayListOf<Task>()
     val taskAdapter = TaskAdapter(taskList, this)
@@ -32,10 +29,10 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+
         val isNoteEmpty = intent.getBooleanExtra("isNoteEmpty", false)
         if (isNoteEmpty) {
-            Log.i("position", "done")
-            Snackbar.make(parentLayout, "Blank note discarded", Snackbar.LENGTH_LONG).show()
+            parentLayout.showSnackbar("Blank note discarded")
         }
 
         recyclerView.apply {
@@ -43,6 +40,8 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             adapter = this@MainActivity.taskAdapter // use this: taskAdapter
         }
+
+        enableSwipe()
 
         db.getDao().getAllTask().observe(this, Observer {
             if (!it.isNullOrEmpty()) {
@@ -54,14 +53,10 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
 
         floatingActionButton.setOnClickListener {
             startActivity(Intent(this, AddTaskActivity::class.java))
-            //val value = intent.getIntExtra("key", 0)
-
         }
-
-
     }
 
-    private fun swipe() {
+    private fun enableSwipe() {
         val simpleCallbacks = object :
             ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(
@@ -86,17 +81,33 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
                     val icon: Bitmap
 
                     if (dX > 0) {
-                        icon = BitmapFactory.decodeResource(resources, R.drawable.delete_icon)
-                        paint.color = Color.parseColor((Color.WHITE).toString())
+                        icon = BitmapFactory.decodeResource(resources, R.mipmap.delete_mipmap_small)
+                        paint.color = Color.parseColor("#ffffff")
                         canvas.drawRect(
+                            itemView.left.toFloat(), itemView.top.toFloat(),
+                            itemView.left.toFloat() + dX, itemView.bottom.toFloat(), paint
+                        )
+                        canvas.drawBitmap(
+                            icon,
                             itemView.left.toFloat(),
-                            itemView.top.toFloat(),
-                            itemView.right.toFloat(),
-                            itemView.bottom.toFloat(),
+                            itemView.top.toFloat() + (itemView.bottom.toFloat() - itemView.top.toFloat() - icon.height.toFloat()) / 2,
                             paint
                         )
-                        canvas.drawBitmap(icon, )
+                    } else {
+                        icon = BitmapFactory.decodeResource(resources, R.mipmap.delete_mipmap_small)
+                        paint.color = Color.parseColor("#ffffff")
+                        canvas.drawRect(
+                            itemView.right.toFloat() + dX, itemView.top.toFloat(),
+                            itemView.right.toFloat(), itemView.bottom.toFloat(), paint
+                        )
+                        canvas.drawBitmap(
+                            icon,
+                            itemView.right.toFloat() - icon.width,
+                            itemView.top.toFloat() + (itemView.bottom.toFloat() - itemView.top.toFloat() - icon.height.toFloat()) / 2,
+                            paint
+                        )
                     }
+                    viewHolder.itemView.translationX = dX
                 } else
                     super.onChildDraw(
                         canvas,
@@ -111,19 +122,42 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
+                val deletedTask = taskList.get(position)
+                val tempTaskName =
+                    if (!taskList[position].tName.isNullOrEmpty())
+                        taskList[position].tName.toString()
+                    else
+                        "Note"
 
+                GlobalScope.launch(Dispatchers.IO) {
+                    db.getDao().deleteTask(taskAdapter.getItemId(position))
+                    taskList.removeAt(position)
+                    taskAdapter.notifyItemRemoved(position)
+                    Snackbar.make(
+                            recyclerView,
+                            "${tempTaskName} is deleted",
+                            Snackbar.LENGTH_LONG
+                        )
+                        .setBackgroundTint(Color.WHITE)
+                        .setTextColor(Color.BLACK)
+                        .setActionTextColor(Color.parseColor("#FF05B30E"))
+                        .setAction("UNDO", object : View.OnClickListener {
+                            override fun onClick(v: View?) {
+                                taskList.add(position, deletedTask)
+                                taskAdapter.notifyItemInserted(position)
+                            }
+                        }).show()
+                }
                 when (direction) {
                     ItemTouchHelper.LEFT -> {
-                        db.getDao().deleteTask(taskAdapter.getItemId(position).toInt())
-                        taskAdapter.notifyItemRemoved(position)
                     }
                     ItemTouchHelper.RIGHT -> {
-
                     }
                 }
             }
-
         }
+        val itemTouchHelper = ItemTouchHelper(simpleCallbacks)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -144,7 +178,6 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
 
     override fun onItemClick(position: Int) {
         val intent = Intent(this, AddTaskActivity::class.java)
-
         intent.putExtra("isTaskOld", true)
         intent.putExtra("taskId", taskList[position].tID)
         intent.putExtra("taskTitle", taskList[position].tName)
@@ -152,12 +185,10 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
         intent.putExtra("taskCreationDate", taskList[position].tEditDate)
         intent.putExtra("taskRemainderDate", taskList[position].tRemainderDate)
         intent.putExtra("taskRemainderTime", taskList[position].tRemainderTime)
-        //intent.putExtra("taskActivation", taskList[position].tActivate)
         startActivity(intent)
     }
 
     override fun onLongItemClick(position: Int) {
-        TODO("Not yet implemented")
+        this.showToast("clicked")
     }
 }
-

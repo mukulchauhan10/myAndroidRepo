@@ -12,7 +12,7 @@ interface TaskDAO {
     fun getAllTask(): LiveData<List<Task>>
 
     @Query("delete from Task where tid = :uid")
-    fun deleteTask(uid: Int)
+    suspend fun deleteTask(uid: Long)
 
     @Query("update Task set tName = :uTitle, tTask = :uTask, tEditDate = :uEditDate, tRemainderDate = :uRemDate, tRemainderTime = :uRemTime, tActivate = :uActivation where tID = :uId")
     suspend fun updateTask(
