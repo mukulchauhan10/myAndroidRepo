@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import com.example.roomdbapplication.Activity.SomeFunction.showSnackbar
 import com.example.roomdbapplication.Activity.SomeFunction.showToast
+import java.util.*
 
 class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
 
@@ -41,7 +42,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
             adapter = this@MainActivity.taskAdapter // use this: taskAdapter
         }
 
-        enableSwipe()
+        enable_Swipe_And_Drag()
 
         db.getDao().getAllTask().observe(this, Observer {
             if (!it.isNullOrEmpty()) {
@@ -56,14 +57,25 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
         }
     }
 
-    private fun enableSwipe() {
+    private fun enable_Swipe_And_Drag() {
         val simpleCallbacks = object :
-            ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+            ) {
+
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
-            ): Boolean = false
+            ): Boolean {
+
+                val fromPosition = viewHolder.adapterPosition
+                val toPosition = target.adapterPosition
+                Collections.swap(taskList,fromPosition, toPosition)
+                recyclerView.adapter?.notifyItemMoved(fromPosition,toPosition)
+                return true
+            }
 
             override fun onChildDraw(
                 canvas: Canvas,
@@ -120,6 +132,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
                     )
             }
 
+
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 val deletedTask = taskList.get(position)
@@ -132,7 +145,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
                 GlobalScope.launch(Dispatchers.IO) {
                     db.getDao().deleteTask(taskAdapter.getItemId(position))
                     taskList.removeAt(position)
-                    taskAdapter.notifyItemRemoved(position)
+                    recyclerView.adapter?.notifyItemRemoved(position)
                     Snackbar.make(
                             recyclerView,
                             "${tempTaskName} is deleted",
@@ -144,7 +157,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
                         .setAction("UNDO", object : View.OnClickListener {
                             override fun onClick(v: View?) {
                                 taskList.add(position, deletedTask)
-                                taskAdapter.notifyItemInserted(position)
+                                recyclerView.adapter?.notifyItemInserted(position)
                             }
                         }).show()
                 }

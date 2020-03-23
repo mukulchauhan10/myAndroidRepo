@@ -14,7 +14,9 @@ interface TaskDAO {
     @Query("delete from Task where tid = :uid")
     suspend fun deleteTask(uid: Long)
 
-    @Query("update Task set tName = :uTitle, tTask = :uTask, tEditDate = :uEditDate, tRemainderDate = :uRemDate, tRemainderTime = :uRemTime, tActivate = :uActivation where tID = :uId")
+    @Query(
+        "update Task set tName = :uTitle, tTask = :uTask, tEditDate = :uEditDate, tRemainderDate = :uRemDate, tRemainderTime = :uRemTime, tActivate = :uActivation where tID = :uId"
+    )
     suspend fun updateTask(
         uTitle: String?,
         uTask: String?,
