@@ -7,7 +7,7 @@ import com.example.roomdbapplication.R
 import com.example.roomdbapplication.database.Task
 import kotlinx.android.synthetic.main.list_item.view.*
 
-class TaskAdapter(val taskList: List<Task>, val recyclerItemViewClick: RecyclerItemViewClick) :
+class TaskAdapter(val taskList: List<Task>, val recyclerItemViewClick: RecyclerViewOnClick) :
     RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -52,12 +52,15 @@ class TaskAdapter(val taskList: List<Task>, val recyclerItemViewClick: RecyclerI
                     recyclerItemViewClick.onItemClick(position)
                 }
             })
+            setOnLongClickListener(object : View.OnLongClickListener{
+                override fun onLongClick(v: View?): Boolean {
+                    recyclerItemViewClick.onLongItemClick(position)
+                    return true
+                }
+
+            })
         }
     }
 
     inner class TaskViewHolder(val view: View) : RecyclerView.ViewHolder(view)
-
-    interface RecyclerItemViewClick {
-        fun onItemClick(position: Int)
-    }
 }

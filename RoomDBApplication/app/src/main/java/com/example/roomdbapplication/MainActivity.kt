@@ -1,21 +1,25 @@
 package com.example.roomdbapplication
 
 import android.content.Intent
+import android.graphics.*
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.roomdbapplication.Activity.AddTaskActivity
 import com.example.roomdbapplication.Activity.BinActivity
+import com.example.roomdbapplication.Activity.RecyclerViewOnClick
 import com.example.roomdbapplication.Activity.TaskAdapter
 import com.example.roomdbapplication.database.Task
 import com.example.roomdbapplication.database.TaskDatabase
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), TaskAdapter.RecyclerItemViewClick {
+class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
 
     var taskList = arrayListOf<Task>()
     val taskAdapter = TaskAdapter(taskList, this)
@@ -53,6 +57,73 @@ class MainActivity : AppCompatActivity(), TaskAdapter.RecyclerItemViewClick {
             //val value = intent.getIntExtra("key", 0)
 
         }
+
+
+    }
+
+    private fun swipe() {
+        val simpleCallbacks = object :
+            ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun onChildDraw(
+                canvas: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    val itemView = viewHolder.itemView
+                    val paint = Paint()
+                    val icon: Bitmap
+
+                    if (dX > 0) {
+                        icon = BitmapFactory.decodeResource(resources, R.drawable.delete_icon)
+                        paint.color = Color.parseColor((Color.WHITE).toString())
+                        canvas.drawRect(
+                            itemView.left.toFloat(),
+                            itemView.top.toFloat(),
+                            itemView.right.toFloat(),
+                            itemView.bottom.toFloat(),
+                            paint
+                        )
+                        canvas.drawBitmap(icon, )
+                    }
+                } else
+                    super.onChildDraw(
+                        canvas,
+                        recyclerView,
+                        viewHolder,
+                        dX,
+                        dY,
+                        actionState,
+                        isCurrentlyActive
+                    )
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+
+                when (direction) {
+                    ItemTouchHelper.LEFT -> {
+                        db.getDao().deleteTask(taskAdapter.getItemId(position).toInt())
+                        taskAdapter.notifyItemRemoved(position)
+                    }
+                    ItemTouchHelper.RIGHT -> {
+
+                    }
+                }
+            }
+
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -83,6 +154,10 @@ class MainActivity : AppCompatActivity(), TaskAdapter.RecyclerItemViewClick {
         intent.putExtra("taskRemainderTime", taskList[position].tRemainderTime)
         //intent.putExtra("taskActivation", taskList[position].tActivate)
         startActivity(intent)
+    }
+
+    override fun onLongItemClick(position: Int) {
+        TODO("Not yet implemented")
     }
 }
 

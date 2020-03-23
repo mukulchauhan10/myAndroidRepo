@@ -71,7 +71,7 @@ class AddTaskActivity : CoroutineJob() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.new_task_menu, menu)
         menuInflater.inflate(R.menu.bottom_toolbar_menu, menu)  // not confirm
-        return super.onCreateOptionsMenu(menu)
+        return true
     }
 
 
@@ -127,7 +127,7 @@ class AddTaskActivity : CoroutineJob() {
                 this.showToast("shared")
             } // not confirm
         }
-        return super.onOptionsItemSelected(item)
+        return true
     }
 
     private fun currentDateProvider(): String {
