@@ -1,10 +1,13 @@
 package com.example.roomdbapplication.Activity
 
 import android.annotation.SuppressLint
-import android.app.*
-import android.content.*
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import com.example.roomdbapplication.Activity.SomeFunction.showToast
 import com.example.roomdbapplication.CoroutineJob
 import com.example.roomdbapplication.MainActivity
@@ -12,7 +15,9 @@ import com.example.roomdbapplication.R
 import com.example.roomdbapplication.database.Task
 import com.example.roomdbapplication.database.TaskDatabase
 import kotlinx.android.synthetic.main.activity_add_task.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -67,11 +72,13 @@ class AddTaskActivity : CoroutineJob() {
             dateDialog()
         }
     }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.new_task_menu, menu)
         menuInflater.inflate(R.menu.bottom_toolbar_menu, menu)
         return true
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.done -> {
@@ -96,6 +103,7 @@ class AddTaskActivity : CoroutineJob() {
                             }
                             this@AddTaskActivity.showToast("$taskName is updated")
                         }
+                        finish()
                     } else {
                         launch {
                             withContext(Dispatchers.IO) {
@@ -111,8 +119,9 @@ class AddTaskActivity : CoroutineJob() {
                             }
                             this@AddTaskActivity.showToast("${task.tName} is saved")
                         }
+                        finish()
                     }
-                    finish()
+
                 } else if (taskName.isNullOrEmpty() && taskDesc.isNullOrEmpty()) {
                     val intent = Intent(this, MainActivity::class.java)
                     intent.putExtra("isNoteEmpty", true)

@@ -2,6 +2,7 @@ package com.example.roomdbapplication.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import java.text.FieldPosition
 
 @Dao
 interface TaskDAO {
@@ -13,6 +14,9 @@ interface TaskDAO {
 
     @Query("delete from Task where tid = :uid")
     suspend fun deleteTask(uid: Long)
+
+    @Query("update Task set tID=:toPosition where tID=:fromPosition")
+    suspend fun changeTaskPosition(fromPosition: Int, toPosition: Int)
 
     @Query(
         "update Task set tName = :uTitle, tTask = :uTask, tEditDate = :uEditDate, tRemainderDate = :uRemDate, tRemainderTime = :uRemTime, tActivate = :uActivation where tID = :uId"

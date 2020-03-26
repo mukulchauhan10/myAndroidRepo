@@ -6,6 +6,21 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">#B75A5A5A</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="backgroundColor">@color/mainBackground</item>
+        <item name="cardBackground">@color/mainBackground</item>
+        <item name="mainTextColor">@color/mainText</item>
+        <item name="subTextColor">@color/subText</item>
+    </style>
+
+    <style name="darkTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">#B7E8E8E8</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="backgroundColor">#000000</item>
+        <item name="cardBackground">#232323</item>
+        <item name="mainTextColor">#FFFFFF</item>
+        <item name="subTextColor">#E6E6E6</item>
     </style>
 
 </resources>

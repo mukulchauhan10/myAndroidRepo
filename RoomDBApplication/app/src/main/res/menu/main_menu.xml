@@ -10,6 +10,13 @@
     <item android:id="@+id/bin"
         android:title="Bin"
         android:icon="@drawable/bin_icon"
+
         app:showAsAction="never"/>
+    <item android:id="@+id/darkMode"
+        android:title="Dark Mode"
+        android:checkable="true"
+        android:actionLayout="@layout/switch_layout"
+        app:showAsAction="never"/>
+
 
 </menu>

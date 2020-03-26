@@ -5,6 +5,7 @@
     android:id="@+id/parentLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/backgroundColor"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
@@ -12,21 +13,24 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_margin="7dp"
         android:background="@drawable/tootbar_fancy"
         android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar"
-        android:layout_margin="7dp"
         app:title="Task"
+        app:titleTextColor="?attr/mainTextColor"
         tools:targetApi="p" />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="?attr/backgroundColor">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="10dp"/>
+            android:background="?attr/backgroundColor"
+            android:padding="10dp" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floatingActionButton"
@@ -34,11 +38,12 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:backgroundTint="#fff"
             android:layout_marginEnd="23dp"
             android:layout_marginBottom="21dp"
             android:clickable="true"
+            app:backgroundTint="?attr/backgroundColor"
             app:srcCompat="@drawable/add_icon" />
+
     </RelativeLayout>
 
 </LinearLayout>

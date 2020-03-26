@@ -12,9 +12,11 @@
         <activity android:name=".Activity.BinActivity"></activity>
         <activity
             android:name=".Activity.AddTaskActivity"
+            android:configChanges="uiMode"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MainActivity"
+            android:configChanges="uiMode"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

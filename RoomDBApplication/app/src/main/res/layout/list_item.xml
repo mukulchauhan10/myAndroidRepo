@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="3dp"
     android:layout_weight="2"
-    app:cardBackgroundColor="#FFFFFF"
+    app:cardBackgroundColor="?attr/cardBackground"
     app:cardCornerRadius="10dp"
     app:strokeColor="#D5D5D5"
     app:strokeWidth="1dp">
@@ -16,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="?attr/cardBackground"
         android:padding="11dp">
 
         <TextView
@@ -26,7 +27,7 @@
             android:maxLines="2"
             android:paddingVertical="2dp"
             android:text="Title"
-            android:textColor="#000"
+            android:textColor="?attr/mainTextColor"
             android:textSize="19sp"
             android:visibility="gone" />
 
@@ -38,8 +39,8 @@
             android:paddingVertical="6dp"
             android:ellipsize="end"
             android:maxLines="14"
+            android:textColor="?attr/subTextColor"
             android:text="Note"
-            android:textColor="#6A6A6A"
             android:visibility="gone" />
 
         <TextView
@@ -48,7 +49,7 @@
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/notify_icon"
             android:text=" Remainder"
-            android:textColor="#ACACAC"
+            android:textColor="?attr/subTextColor"
             android:textSize="11sp"
             android:textStyle="italic"
             android:visibility="gone" />
@@ -60,7 +61,7 @@
             android:paddingVertical="2dp"
             android:text="id = "
             android:textColor="#6A6A6A"
-            android:visibility="gone" />
+            android:visibility="visible" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
 

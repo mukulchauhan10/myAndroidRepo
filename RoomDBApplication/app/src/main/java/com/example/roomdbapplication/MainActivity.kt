@@ -3,22 +3,34 @@ package com.example.roomdbapplication
 import android.content.Intent
 import android.graphics.*
 import android.os.Bundle
-import android.view.*
-import androidx.appcompat.app.AppCompatActivity
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.*
-import com.example.roomdbapplication.Activity.*
-import com.example.roomdbapplication.database.*
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.example.roomdbapplication.Activity.AddTaskActivity
+import com.example.roomdbapplication.Activity.BinActivity
+import com.example.roomdbapplication.Activity.RecyclerViewOnClick
+import com.example.roomdbapplication.Activity.SomeFunction.showSnackbarWithUndoAction
+import com.example.roomdbapplication.Activity.SomeFunction.showToast
+import com.example.roomdbapplication.Activity.TaskAdapter
+import com.example.roomdbapplication.database.Task
+import com.example.roomdbapplication.database.TaskDatabase
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.*
-import com.example.roomdbapplication.Activity.SomeFunction.showSnackbar
-import com.example.roomdbapplication.Activity.SomeFunction.showToast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
-class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
+class MainActivity : CoroutineJob(), RecyclerViewOnClick {
 
-
+    lateinit var itemTouchHelper: ItemTouchHelper
+    lateinit var simpleCallBacks: ItemTouchHelper.SimpleCallback
+    var isDark = false
     var taskList = arrayListOf<Task>()
     val taskAdapter = TaskAdapter(taskList, this)
     val db by lazy {
@@ -30,12 +42,11 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-
-        val isNoteEmpty = intent.getBooleanExtra("isNoteEmpty", false)
-        if (isNoteEmpty) {
-            parentLayout.showSnackbar("Blank note discarded")
-        }
-
+        /*if (isDark) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+*/
         recyclerView.apply {
             setHasFixedSize(true)
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -43,6 +54,9 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
         }
 
         enable_Swipe_And_Drag()
+
+        itemTouchHelper = ItemTouchHelper(simpleCallBacks)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
 
         db.getDao().getAllTask().observe(this, Observer {
             if (!it.isNullOrEmpty()) {
@@ -58,7 +72,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
     }
 
     private fun enable_Swipe_And_Drag() {
-        val simpleCallbacks = object :
+        simpleCallBacks = object :
             ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or ItemTouchHelper.UP or ItemTouchHelper.DOWN,
                 ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
@@ -72,9 +86,37 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
 
                 val fromPosition = viewHolder.adapterPosition
                 val toPosition = target.adapterPosition
-                Collections.swap(taskList,fromPosition, toPosition)
-                recyclerView.adapter?.notifyItemMoved(fromPosition,toPosition)
+                Collections.swap(taskList, fromPosition, toPosition)
+                recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
+
+                /*GlobalScope.launch(Dispatchers.Main) {
+                    withContext(Dispatchers.IO) {
+                        return@withContext db.getDao().changeTaskPosition(fromPosition, toPosition)
+                    }
+                }*/
                 return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val deletedTask = taskList.get(position)
+                val tempTaskName =
+                    if (!taskList[position].tName.isNullOrEmpty())
+                        taskList[position].tName.toString()
+                    else
+                        "Note"
+                GlobalScope.launch(Dispatchers.Main) {
+                    withContext(Dispatchers.IO) {
+                        taskList.removeAt(position)
+                        recyclerView.adapter?.notifyItemRemoved(position)
+                        return@withContext db.getDao().deleteTask(position.toLong())
+                    }
+                }
+
+                recyclerView.showSnackbarWithUndoAction("${tempTaskName} is deleted",{
+                    taskList.add(position,deletedTask)
+                    recyclerView.adapter?.notifyItemInserted(position)
+                })
             }
 
             override fun onChildDraw(
@@ -131,51 +173,18 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
                         isCurrentlyActive
                     )
             }
-
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                val deletedTask = taskList.get(position)
-                val tempTaskName =
-                    if (!taskList[position].tName.isNullOrEmpty())
-                        taskList[position].tName.toString()
-                    else
-                        "Note"
-
-                GlobalScope.launch(Dispatchers.IO) {
-                    db.getDao().deleteTask(taskAdapter.getItemId(position))
-                    taskList.removeAt(position)
-                    recyclerView.adapter?.notifyItemRemoved(position)
-                    Snackbar.make(
-                            recyclerView,
-                            "${tempTaskName} is deleted",
-                            Snackbar.LENGTH_LONG
-                        )
-                        .setBackgroundTint(Color.WHITE)
-                        .setTextColor(Color.BLACK)
-                        .setActionTextColor(Color.parseColor("#FF05B30E"))
-                        .setAction("UNDO", object : View.OnClickListener {
-                            override fun onClick(v: View?) {
-                                taskList.add(position, deletedTask)
-                                recyclerView.adapter?.notifyItemInserted(position)
-                            }
-                        }).show()
-                }
-                when (direction) {
-                    ItemTouchHelper.LEFT -> {
-                    }
-                    ItemTouchHelper.RIGHT -> {
-                    }
-                }
-            }
         }
-        val itemTouchHelper = ItemTouchHelper(simpleCallbacks)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val checkable = menu?.findItem(R.id.darkMode)
+        checkable?.setChecked(isDark)
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -184,6 +193,16 @@ class MainActivity : AppCompatActivity(), RecyclerViewOnClick {
                 startActivity(Intent(this, BinActivity::class.java))
             }
             R.id.search -> {
+            }
+            R.id.darkMode -> {
+                isDark = !item.isChecked
+                item.setChecked(isDark)
+
+                if (isDark) {
+                    this.showToast("on")
+                } else {
+                    this.showToast("off")
+                }
             }
         }
         return super.onOptionsItemSelected(item)

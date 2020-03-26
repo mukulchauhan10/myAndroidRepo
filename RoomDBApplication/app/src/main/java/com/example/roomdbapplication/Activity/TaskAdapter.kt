@@ -26,6 +26,7 @@ class TaskAdapter(val taskList: List<Task>, val recyclerItemViewClick: RecyclerV
     @SuppressLint("SetTextI18n") // yuhi, alt + Enter
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         with(holder.view) {
+            taskIDView.text = taskList[position].tID.toString()
             taskList[position].tName?.let {
                 taskNameView.apply {
                     text = taskList[position].tName
