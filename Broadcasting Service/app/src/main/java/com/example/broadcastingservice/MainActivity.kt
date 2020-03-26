@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -12,6 +13,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val localBroadcastManager = LocalBroadcastManager.getInstance(this)
+        val localIntent = Intent("com.example.broadcastingservice").putExtra("name", "Mukul")
+        localBroadcastManager.registerReceiver(receiver,
+            IntentFilter("com.example.broadcastingservice")
+        )
+        localBroadcastManager.sendBroadcast(localIntent)
     }
 
     override fun onStart() {
