@@ -1,5 +1,8 @@
 package com.example.broadcastingservice
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
@@ -15,10 +18,24 @@ class MainActivity : AppCompatActivity() {
 
         val localBroadcastManager = LocalBroadcastManager.getInstance(this)
         val localIntent = Intent("com.example.broadcastingservice").putExtra("name", "Mukul")
-        localBroadcastManager.registerReceiver(receiver,
+        localBroadcastManager.registerReceiver(
+            receiver,
             IntentFilter("com.example.broadcastingservice")
         )
         localBroadcastManager.sendBroadcast(localIntent)
+        setUpAlarm()
+    }
+
+    private fun setUpAlarm() {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, MyBroadcastReceiver::class.java)
+        intent.putExtra("name", "any name")
+        val pendingIntent = PendingIntent.getBroadcast(
+            this, 0, intent, PendingIntent.FLAG_ONE_SHOT
+        )
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 20000, pendingIntent
+        )
     }
 
     override fun onStart() {
