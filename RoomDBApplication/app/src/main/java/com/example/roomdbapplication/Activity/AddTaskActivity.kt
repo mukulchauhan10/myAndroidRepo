@@ -5,6 +5,7 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -121,10 +122,10 @@ class AddTaskActivity : CoroutineJob() {
                         }
                         finish()
                     }
-
                 } else if (taskName.isNullOrEmpty() && taskDesc.isNullOrEmpty()) {
                     val intent = Intent(this, MainActivity::class.java)
                     intent.putExtra("isNoteEmpty", true)
+                    Log.d("myDebug", "1")
                     startActivity(intent)
                     finish()
                 }

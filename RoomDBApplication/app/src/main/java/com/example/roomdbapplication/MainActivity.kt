@@ -5,7 +5,7 @@ import android.graphics.*
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -13,18 +13,20 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.roomdbapplication.Activity.AddTaskActivity
 import com.example.roomdbapplication.Activity.BinActivity
 import com.example.roomdbapplication.Activity.RecyclerViewOnClick
+import com.example.roomdbapplication.Activity.SomeFunction.showSnackbar
 import com.example.roomdbapplication.Activity.SomeFunction.showSnackbarWithUndoAction
 import com.example.roomdbapplication.Activity.SomeFunction.showToast
 import com.example.roomdbapplication.Activity.TaskAdapter
 import com.example.roomdbapplication.database.Task
 import com.example.roomdbapplication.database.TaskDatabase
-import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+
 
 class MainActivity : CoroutineJob(), RecyclerViewOnClick {
 
@@ -33,8 +35,13 @@ class MainActivity : CoroutineJob(), RecyclerViewOnClick {
     var isDark = false
     var taskList = arrayListOf<Task>()
     val taskAdapter = TaskAdapter(taskList, this)
+
     val db by lazy {
         TaskDatabase.buildDatabase(this)
+    }
+
+    val fAuth by lazy {
+        FirebaseAuth.getInstance()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,11 +49,6 @@ class MainActivity : CoroutineJob(), RecyclerViewOnClick {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        /*if (isDark) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-*/
         recyclerView.apply {
             setHasFixedSize(true)
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -68,6 +70,11 @@ class MainActivity : CoroutineJob(), RecyclerViewOnClick {
 
         floatingActionButton.setOnClickListener {
             startActivity(Intent(this, AddTaskActivity::class.java))
+        }
+
+        val isNoteEmpty = intent.getBooleanExtra("isNoteEmpty", false)
+        if (isNoteEmpty) {
+            parentLayout.showSnackbar("Blank note discarded")
         }
     }
 
@@ -108,14 +115,13 @@ class MainActivity : CoroutineJob(), RecyclerViewOnClick {
                 GlobalScope.launch(Dispatchers.Main) {
                     withContext(Dispatchers.IO) {
                         taskList.removeAt(position)
-                        recyclerView.adapter?.notifyItemRemoved(position)
+                        taskAdapter.notifyItemRemoved(position)
                         return@withContext db.getDao().deleteTask(position.toLong())
                     }
                 }
-
-                recyclerView.showSnackbarWithUndoAction("${tempTaskName} is deleted",{
-                    taskList.add(position,deletedTask)
-                    recyclerView.adapter?.notifyItemInserted(position)
+                recyclerView.showSnackbarWithUndoAction("$tempTaskName is deleted", {
+                    taskList.add(position, deletedTask)
+                    taskAdapter.notifyItemInserted(position)
                 })
             }
 
@@ -178,7 +184,42 @@ class MainActivity : CoroutineJob(), RecyclerViewOnClick {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
+        val searchButton = menu?.findItem(R.id.search)
+        searchBox(searchButton!!)
         return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun searchBox(searchButton: MenuItem) {
+        val searchView: SearchView = searchButton.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                TODO("Not yet implemented")
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let {
+                    displaySearchResult(newText)
+                    return true
+                } ?: return false
+            }
+        })
+    }
+
+    private fun displaySearchResult(newText: String) {
+        db.getDao().getAllTask().observe(this, Observer {
+            if (it.isNotEmpty()) {
+                taskList.clear()
+                taskList.addAll(
+                    it.filter {
+                        with(it) {
+                            tName!!.contains(newText, true) or tTask!!.contains(newText, true)
+                        }
+                    }
+                )
+                taskAdapter.notifyDataSetChanged()
+            }
+        })
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
@@ -192,21 +233,10 @@ class MainActivity : CoroutineJob(), RecyclerViewOnClick {
             R.id.bin -> {
                 startActivity(Intent(this, BinActivity::class.java))
             }
-            R.id.search -> {
-            }
-            R.id.darkMode -> {
-                isDark = !item.isChecked
-                item.setChecked(isDark)
-
-                if (isDark) {
-                    this.showToast("on")
-                } else {
-                    this.showToast("off")
-                }
-            }
         }
         return super.onOptionsItemSelected(item)
     }
+
 
     override fun onItemClick(position: Int) {
         val intent = Intent(this, AddTaskActivity::class.java)

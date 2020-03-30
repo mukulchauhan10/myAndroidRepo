@@ -19,8 +19,6 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/newNoteToolbar"
             android:layout_width="match_parent"
-            android:outlineSpotShadowColor="#000"
-            android:outlineAmbientShadowColor="#000"
             android:layout_height="50dp"
             android:layout_gravity="top"
             android:layout_margin="7dp"
@@ -51,7 +49,6 @@
             android:id="@+id/taskDescriptionEditText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-
             android:background="?attr/backgroundColor"
             android:textColorHighlight="#D5D5D5"
             android:gravity="top"

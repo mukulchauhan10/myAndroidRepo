@@ -2,21 +2,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/search"
-        android:title="Search"
+    <item
+        android:id="@+id/search"
         android:icon="@drawable/search_icon"
+        android:title="Search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
-        app:showAsAction="ifRoom|collapseActionView"/>
-    <item android:id="@+id/bin"
-        android:title="Bin"
+        app:showAsAction="ifRoom|collapseActionView" />
+    <item
+        android:id="@+id/bin"
         android:icon="@drawable/bin_icon"
-
-        app:showAsAction="never"/>
-    <item android:id="@+id/darkMode"
-        android:title="Dark Mode"
+        android:title="Bin"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/darkMode"
         android:checkable="true"
-        android:actionLayout="@layout/switch_layout"
-        app:showAsAction="never"/>
+        android:title="Dark Mode"
+        app:actionViewClass="com.google.android.material.switchmaterial.SwitchMaterial"
+        app:showAsAction="never" />
 
 
 </menu>

@@ -1,14 +1,18 @@
 package com.example.roomdbapplication.Activity
 
 import android.annotation.SuppressLint
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.roomdbapplication.R
 import com.example.roomdbapplication.database.Task
 import kotlinx.android.synthetic.main.list_item.view.*
 
-class TaskAdapter(val taskList: List<Task>, val recyclerItemViewClick: RecyclerViewOnClick) :
-    RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
+class TaskAdapter(
+    val taskList: List<Task>,
+    val recyclerItemViewClick: RecyclerViewOnClick
+) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         return TaskViewHolder(
@@ -53,7 +57,7 @@ class TaskAdapter(val taskList: List<Task>, val recyclerItemViewClick: RecyclerV
                     recyclerItemViewClick.onItemClick(position)
                 }
             })
-            setOnLongClickListener(object : View.OnLongClickListener{
+            setOnLongClickListener(object : View.OnLongClickListener {
                 override fun onLongClick(v: View?): Boolean {
                     recyclerItemViewClick.onLongItemClick(position)
                     return true
