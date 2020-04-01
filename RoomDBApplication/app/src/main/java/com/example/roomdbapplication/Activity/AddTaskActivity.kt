@@ -81,10 +81,13 @@ class AddTaskActivity : CoroutineJob() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val taskName: String?
+        val taskDesc: String?
         when (item.itemId) {
+
             R.id.done -> {
-                val taskName: String? = taskNameEditText.text?.toString()?.trim()
-                val taskDesc: String? = taskDescriptionEditText.text?.toString()?.trim()
+                taskName = taskNameEditText.text?.toString()?.trim()
+                taskDesc = taskDescriptionEditText.text?.toString()?.trim()
                 val activationInfo: Boolean = isRemainderActivate(exactDate, exactTime)
                 val taskDate: String = currentDateProvider()
                 lateinit var task: Task
@@ -125,16 +128,60 @@ class AddTaskActivity : CoroutineJob() {
                 } else if (taskName.isNullOrEmpty() && taskDesc.isNullOrEmpty()) {
                     val intent = Intent(this, MainActivity::class.java)
                     intent.putExtra("isNoteEmpty", true)
-                    Log.d("myDebug", "1")
                     startActivity(intent)
                     finish()
                 }
             }
             R.id.share -> {
-                this.showToast("shared")
-            } // not confirm
+                taskName = taskNameEditText.text?.toString()?.trim()
+                taskDesc = taskDescriptionEditText.text?.toString()?.trim()
+                shareNote(taskName, taskDesc)
+            }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun shareNote(taskName: String?, taskDesc: String?) {
+        Log.i("myDebug", "1")
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            type = "text/plain"
+        }
+        val shareIntent = Intent.createChooser(sendIntent, taskName)
+
+        if (taskName!!.isNotEmpty() or taskDesc!!.isNotEmpty()) {
+            when {
+                taskName.isEmpty() ->
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, taskDesc)
+                taskDesc.isEmpty() ->
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, taskName)
+                taskName.isNotEmpty() and taskDesc.isNotEmpty() ->
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, "*$taskName*\n$taskDesc")
+            }
+            startActivity(shareIntent)
+        }
+
+        /*if(!(taskName.isNullOrBlank() || taskDesc.isNullOrBlank())){
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, "*$taskName*\n$taskDesc")
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, taskName)
+
+            startActivity(shareIntent)
+        }
+
+        taskName?: run {
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, "*$taskName*\n$taskDesc")
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, taskName)
+
+            startActivity(shareIntent)
+        }*/
     }
 
     private fun currentDateProvider(): String {
@@ -196,8 +243,7 @@ class AddTaskActivity : CoroutineJob() {
         timePickerDialog.show()
     }
 
+
     private fun isRemainderActivate(date: String?, time: String?): Boolean =
         date != null || time != null
-
-
 }

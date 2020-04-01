@@ -1,5 +1,8 @@
 package com.example.roomdbapplication
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.graphics.*
 import android.os.Bundle
@@ -17,6 +20,7 @@ import com.example.roomdbapplication.Activity.SomeFunction.showSnackbar
 import com.example.roomdbapplication.Activity.SomeFunction.showSnackbarWithUndoAction
 import com.example.roomdbapplication.Activity.SomeFunction.showToast
 import com.example.roomdbapplication.Activity.TaskAdapter
+import com.example.roomdbapplication.alarm_notification.MyBroadcastManager
 import com.example.roomdbapplication.database.Task
 import com.example.roomdbapplication.database.TaskDatabase
 import com.google.firebase.auth.FirebaseAuth
@@ -27,6 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
+const val ALARM_CODE = 123
 
 class MainActivity : CoroutineJob(), RecyclerViewOnClick {
 
@@ -35,13 +40,8 @@ class MainActivity : CoroutineJob(), RecyclerViewOnClick {
     var isDark = false
     var taskList = arrayListOf<Task>()
     val taskAdapter = TaskAdapter(taskList, this)
-
     val db by lazy {
         TaskDatabase.buildDatabase(this)
-    }
-
-    val fAuth by lazy {
-        FirebaseAuth.getInstance()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -236,7 +236,6 @@ class MainActivity : CoroutineJob(), RecyclerViewOnClick {
         }
         return super.onOptionsItemSelected(item)
     }
-
 
     override fun onItemClick(position: Int) {
         val intent = Intent(this, AddTaskActivity::class.java)
